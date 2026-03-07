@@ -11,9 +11,15 @@
           }
         },
         {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
+          }
+        },
+        {
           "type": "named",
           "data": {
-            "name": null
+            "name": "intake"
           }
         },
         {
@@ -21,11 +27,17 @@
           "data": {
             "pathName": "red2"
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "shoot"
+          }
         }
       ]
     }
   },
-  "resetOdom": true,
+  "resetOdom": false,
   "folder": null,
   "choreoAuto": false
 }
