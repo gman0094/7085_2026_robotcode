@@ -45,11 +45,7 @@ public class FaceTagWhileDriving extends Command {
     }
 
     drive.runVelocity(
-        ChassisSpeeds.fromFieldRelativeSpeeds(
-            xSpeed,
-            ySpeed,
-            omega,
-            drive.getRotation()));
+        ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, omega, drive.getRotation()));
   }
 
   @Override

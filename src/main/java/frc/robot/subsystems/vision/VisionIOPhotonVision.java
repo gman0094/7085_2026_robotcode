@@ -21,9 +21,7 @@ public class VisionIOPhotonVision implements VisionIO {
     this.robotToCamera = robotToCamera;
     this.poseEstimator =
         new PhotonPoseEstimator(
-            aprilTagLayout,
-            PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-            robotToCamera);
+            aprilTagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, robotToCamera);
     this.poseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
   }
 
@@ -45,8 +43,7 @@ public class VisionIOPhotonVision implements VisionIO {
       var bestTarget = result.getBestTarget();
       inputs.latestTargetObservation =
           new TargetObservation(
-              bestTarget.getFiducialId(),
-              Rotation2d.fromDegrees(bestTarget.getYaw()));
+              bestTarget.getFiducialId(), Rotation2d.fromDegrees(bestTarget.getYaw()));
 
       for (var target : result.getTargets()) {
         int id = target.getFiducialId();
@@ -79,8 +76,7 @@ public class VisionIOPhotonVision implements VisionIO {
         ambiguity = result.getBestTarget().getPoseAmbiguity();
       }
 
-      double averageTagDistance =
-          validTagCount > 0 ? totalDistance / validTagCount : 0.0;
+      double averageTagDistance = validTagCount > 0 ? totalDistance / validTagCount : 0.0;
 
       poseObservations.add(
           new PoseObservation(

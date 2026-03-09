@@ -10,8 +10,7 @@ public interface VisionIO {
     public boolean connected = false;
 
     // Best target observation (kept for simple servoing)
-    public TargetObservation latestTargetObservation =
-        new TargetObservation(-1, new Rotation2d());
+    public TargetObservation latestTargetObservation = new TargetObservation(-1, new Rotation2d());
 
     // All visible targets from the latest frame
     public TargetObservation[] targetObservations = new TargetObservation[] {};
