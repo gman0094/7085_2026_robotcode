@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "blue part one"
+            "pathName": null
           }
         },
         {
@@ -25,7 +25,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "ble part 2"
+            "pathName": null
           }
         },
         {

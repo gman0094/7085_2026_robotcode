@@ -11,7 +11,7 @@ import static frc.robot.subsystems.vision.VisionConstants.camera0Name;
 import static frc.robot.subsystems.vision.VisionConstants.camera1Name;
 import static frc.robot.subsystems.vision.VisionConstants.robotToCamera0;
 import static frc.robot.subsystems.vision.VisionConstants.robotToCamera1;
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -20,9 +20,12 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.commands.AutoTagRotationOverride;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.Eject;
+import frc.robot.commands.FaceTagWhileDriving;
 import frc.robot.commands.Intake;
 import frc.robot.commands.LaunchSequence;
 import frc.robot.generated.TunerConstants;
@@ -37,7 +40,7 @@ import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
-import frc.robot.commands.FaceTagWhileDriving;
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -49,7 +52,7 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private final CANFuelSubsystem fuelSubsystem = new CANFuelSubsystem();
- private final Vision vision;
+  private final Vision vision;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -71,11 +74,11 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
 
-       vision =
-          new Vision(
-              drive::addVisionMeasurement,
-              new VisionIOPhotonVision(camera0Name, robotToCamera0),
-              new VisionIOPhotonVision(camera1Name, robotToCamera1));
+        vision =
+            new Vision(
+                drive::addVisionMeasurement,
+                new VisionIOPhotonVision(camera0Name, robotToCamera0),
+                new VisionIOPhotonVision(camera1Name, robotToCamera1));
         break;
 
       case SIM:
@@ -88,11 +91,11 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
 
-      vision =
-          new Vision(
-              drive::addVisionMeasurement,
-              new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, drive::getPose),
-              new VisionIOPhotonVisionSim(camera1Name, robotToCamera1, drive::getPose));
+        vision =
+            new Vision(
+                drive::addVisionMeasurement,
+                new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, drive::getPose),
+                new VisionIOPhotonVisionSim(camera1Name, robotToCamera1, drive::getPose));
         break;
 
       default:
@@ -104,9 +107,16 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
-       vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
+        vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
         break;
     }
+    NamedCommands.registerCommand("StartTagLock", new AutoTagRotationOverride(vision));
+
+    NamedCommands.registerCommand(
+        "StopTagLock",
+        new InstantCommand(
+            com.pathplanner.lib.controllers.PPHolonomicDriveController
+                ::clearRotationFeedbackOverride));
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -128,6 +138,7 @@ public class RobotContainer {
     //     "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
     // Configure the button bindings
+
     configureButtonBindings();
     controller.leftBumper().whileTrue(new Intake(fuelSubsystem));
     controller.rightBumper().whileTrue(new LaunchSequence(fuelSubsystem));
@@ -174,15 +185,12 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
 
-  controller.leftTrigger().whileTrue(
-    new FaceTagWhileDriving(
-        drive,
-        vision,
-        7,
-        () -> -controller.getLeftY(),
-        () -> -controller.getLeftX()));
+    controller
+        .leftTrigger()
+        .whileTrue(
+            new FaceTagWhileDriving(
+                drive, vision, () -> -controller.getLeftY(), () -> -controller.getLeftX()));
   }
-
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
