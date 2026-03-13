@@ -43,29 +43,29 @@ public class VisionIOPhotonVision implements VisionIO {
     List<PoseObservation> poseObservations = new LinkedList<>();
     for (var result : camera.getAllUnreadResults()) {
       // Update latest target observation
-    // ----- TARGET YAW OBSERVATION (for auto-aim) -----
-
-  inputs.latestTargetObservation =
-    new TargetObservation(-1, Rotation2d.kZero, Rotation2d.kZero);
-
-  if (result.hasTargets()) {
-
-   int wantedTag = VisionConstants.getTargetTagId();
-
-   for (var target : result.targets) {
-
-    if (target.fiducialId == wantedTag) {
+      // ----- TARGET YAW OBSERVATION (for auto-aim) -----
 
       inputs.latestTargetObservation =
-          new TargetObservation(
-              target.fiducialId,
-              Rotation2d.fromDegrees(target.getYaw()),
-              Rotation2d.fromDegrees(target.getPitch()));
+          new TargetObservation(-1, Rotation2d.kZero, Rotation2d.kZero);
 
-      break;
-    }
-  }
-}
+      if (result.hasTargets()) {
+
+        int wantedTag = VisionConstants.getTargetTagId();
+
+        for (var target : result.targets) {
+
+          if (target.fiducialId == wantedTag) {
+
+            inputs.latestTargetObservation =
+                new TargetObservation(
+                    target.fiducialId,
+                    Rotation2d.fromDegrees(target.getYaw()),
+                    Rotation2d.fromDegrees(target.getPitch()));
+
+            break;
+          }
+        }
+      }
 
       // Add pose observation
       if (result.multitagResult.isPresent()) { // Multitag result

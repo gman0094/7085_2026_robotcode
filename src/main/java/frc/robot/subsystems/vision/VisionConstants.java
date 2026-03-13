@@ -18,15 +18,15 @@ public class VisionConstants {
   // AprilTag layout
   public static AprilTagFieldLayout aprilTagLayout =
       AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
- public static final int BLUE_TARGET_TAG_ID = 9;
- public static final int RED_TARGET_TAG_ID = 24;
+  public static final int BLUE_TARGET_TAG_ID = 9;
+  public static final int RED_TARGET_TAG_ID = 24;
 
- public static int getTargetTagId() {
-  Optional<DriverStation.Alliance> alliance = DriverStation.getAlliance();
-  if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red) {
-    return RED_TARGET_TAG_ID;
-  }
-  return BLUE_TARGET_TAG_ID;
+  public static int getTargetTagId() {
+    Optional<DriverStation.Alliance> alliance = DriverStation.getAlliance();
+    if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red) {
+      return RED_TARGET_TAG_ID;
+    }
+    return BLUE_TARGET_TAG_ID;
   }
 
   // Camera names, must match names configured on coprocessor

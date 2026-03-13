@@ -141,9 +141,6 @@ public class RobotContainer {
     controller.rightBumper().whileTrue(new LaunchSequence(fuelSubsystem));
     controller.povDown().whileTrue(new Eject(fuelSubsystem));
     fuelSubsystem.setDefaultCommand(fuelSubsystem.run(() -> fuelSubsystem.stop()));
-
-    
-    
   }
 
   /**
@@ -185,21 +182,19 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
 
-
-              controller
-    .leftTrigger()
-    .whileTrue(
-        DriveCommands.joystickDriveAtAngle(
-            drive,
-            () -> -controller.getLeftY(),
-            () -> -controller.getLeftX(),
-            () -> {
-              if (vision.hasTarget(0)) {
-                return drive.getRotation().minus(vision.getTargetX(0));
-              }
-              return drive.getRotation();
-            }));
-   
+    controller
+        .leftTrigger()
+        .whileTrue(
+            DriveCommands.joystickDriveAtAngle(
+                drive,
+                () -> -controller.getLeftY(),
+                () -> -controller.getLeftX(),
+                () -> {
+                  if (vision.hasTarget(0)) {
+                    return drive.getRotation().minus(vision.getTargetX(0));
+                  }
+                  return drive.getRotation();
+                }));
   }
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

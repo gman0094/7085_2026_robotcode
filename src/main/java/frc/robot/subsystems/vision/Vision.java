@@ -57,6 +57,7 @@ public class Vision extends SubsystemBase {
   public Rotation2d getTargetX(int cameraIndex) {
     return inputs[cameraIndex].latestTargetObservation.tx();
   }
+
   public boolean hasTarget(int cameraIndex) {
     return inputs[cameraIndex].latestTargetObservation.tagId() != -1;
   }
