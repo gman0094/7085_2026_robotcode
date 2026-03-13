@@ -22,10 +22,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.commands.AutoTagRotationOverride;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.Eject;
-import frc.robot.commands.FaceTagWhileDriving;
 import frc.robot.commands.Intake;
 import frc.robot.commands.LaunchSequence;
 import frc.robot.generated.TunerConstants;
@@ -110,7 +108,6 @@ public class RobotContainer {
         vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
         break;
     }
-    NamedCommands.registerCommand("StartTagLock", new AutoTagRotationOverride(vision));
 
     NamedCommands.registerCommand(
         "StopTagLock",
@@ -144,6 +141,9 @@ public class RobotContainer {
     controller.rightBumper().whileTrue(new LaunchSequence(fuelSubsystem));
     controller.povDown().whileTrue(new Eject(fuelSubsystem));
     fuelSubsystem.setDefaultCommand(fuelSubsystem.run(() -> fuelSubsystem.stop()));
+
+    
+    
   }
 
   /**
@@ -185,11 +185,21 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
 
-    controller
-        .leftTrigger()
-        .whileTrue(
-            new FaceTagWhileDriving(
-                drive, vision, () -> -controller.getLeftY(), () -> -controller.getLeftX()));
+
+              controller
+    .leftTrigger()
+    .whileTrue(
+        DriveCommands.joystickDriveAtAngle(
+            drive,
+            () -> -controller.getLeftY(),
+            () -> -controller.getLeftX(),
+            () -> {
+              if (vision.hasTarget(0)) {
+                return drive.getRotation().minus(vision.getTargetX(0));
+              }
+              return drive.getRotation();
+            }));
+   
   }
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

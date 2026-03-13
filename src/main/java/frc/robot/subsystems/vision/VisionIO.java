@@ -1,3 +1,10 @@
+// Copyright (c) 2021-2026 Littleton Robotics
+// http://github.com/Mechanical-Advantage
+//
+// Use of this source code is governed by a BSD
+// license that can be found in the LICENSE file
+// at the root directory of this project.
+
 package frc.robot.subsystems.vision;
 
 import edu.wpi.first.math.geometry.Pose3d;
@@ -8,24 +15,16 @@ public interface VisionIO {
   @AutoLog
   public static class VisionIOInputs {
     public boolean connected = false;
-
-    // Best target observation (kept for simple servoing)
-    public TargetObservation latestTargetObservation = new TargetObservation(-1, new Rotation2d());
-
-    // All visible targets from the latest frame
-    public TargetObservation[] targetObservations = new TargetObservation[] {};
-
-    // IDs of visible AprilTags
-    public int[] tagIds = new int[] {};
-
-    // Pose estimates used by AdvantageKit pose fusion
-    public PoseObservation[] poseObservations = new PoseObservation[] {};
+   public TargetObservation latestTargetObservation =
+    new TargetObservation(-1, Rotation2d.kZero, Rotation2d.kZero);
+public PoseObservation[] poseObservations = new PoseObservation[0];
+    public int[] tagIds = new int[0];
+    
   }
 
-  /** ID + horizontal offset to one detected target. */
-  public static record TargetObservation(int id, Rotation2d tx) {}
-
-  /** One robot pose observation from vision. */
+  /** Represents the angle to a simple target, not used for pose estimation. */
+public static record TargetObservation(int tagId, Rotation2d tx, Rotation2d ty) {}
+  /** Represents a robot pose sample used for pose estimation. */
   public static record PoseObservation(
       double timestamp,
       Pose3d pose,
@@ -35,9 +34,9 @@ public interface VisionIO {
       PoseObservationType type) {}
 
   public static enum PoseObservationType {
-    PHOTONVISION,
     MEGATAG_1,
-    MEGATAG_2
+    MEGATAG_2,
+    PHOTONVISION
   }
 
   public default void updateInputs(VisionIOInputs inputs) {}
