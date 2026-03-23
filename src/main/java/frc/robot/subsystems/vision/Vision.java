@@ -58,10 +58,6 @@ public class Vision extends SubsystemBase {
     return inputs[cameraIndex].latestTargetObservation.tx();
   }
 
-  public boolean hasTarget(int cameraIndex) {
-    return inputs[cameraIndex].latestTargetObservation.tagId() != -1;
-  }
-
   @Override
   public void periodic() {
     for (int i = 0; i < io.length; i++) {

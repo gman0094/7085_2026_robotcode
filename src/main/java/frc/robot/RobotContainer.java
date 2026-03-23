@@ -8,12 +8,11 @@
 package frc.robot;
 
 import static frc.robot.subsystems.vision.VisionConstants.camera0Name;
-import static frc.robot.subsystems.vision.VisionConstants.camera1Name;
 import static frc.robot.subsystems.vision.VisionConstants.robotToCamera0;
-import static frc.robot.subsystems.vision.VisionConstants.robotToCamera1;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -74,9 +73,7 @@ public class RobotContainer {
 
         vision =
             new Vision(
-                drive::addVisionMeasurement,
-                new VisionIOPhotonVision(camera0Name, robotToCamera0),
-                new VisionIOPhotonVision(camera1Name, robotToCamera1));
+                drive::addVisionMeasurement, new VisionIOPhotonVision(camera0Name, robotToCamera0));
         break;
 
       case SIM:
@@ -92,8 +89,8 @@ public class RobotContainer {
         vision =
             new Vision(
                 drive::addVisionMeasurement,
-                new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, drive::getPose),
-                new VisionIOPhotonVisionSim(camera1Name, robotToCamera1, drive::getPose));
+                new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, drive::getPose));
+
         break;
 
       default:
@@ -182,19 +179,19 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
 
+    PIDController aimController = new PIDController(0.2, 0.0, 0.0);
+    aimController.enableContinuousInput(-Math.PI, Math.PI);
     controller
         .leftTrigger()
         .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
+            Commands.startRun(
                 () -> {
-                  if (vision.hasTarget(0)) {
-                    return drive.getRotation().minus(vision.getTargetX(0));
-                  }
-                  return drive.getRotation();
-                }));
+                  aimController.reset();
+                },
+                () -> {
+                  drive.run(0.0, aimController.calculate(vision.getTargetX(0).getRadians()));
+                },
+                drive));
   }
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
