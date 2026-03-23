@@ -37,6 +37,7 @@ import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
+import frc.robot.util.FieldConstants;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -179,19 +180,27 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
 
-    PIDController aimController = new PIDController(0.2, 0.0, 0.0);
-    aimController.enableContinuousInput(-Math.PI, Math.PI);
+    //Blue Auto-Aim
     controller
         .leftTrigger()
         .whileTrue(
-            Commands.startRun(
-                () -> {
-                  aimController.reset();
-                },
-                () -> {
-                  drive.run(0.0, aimController.calculate(vision.getTargetX(0).getRadians()));
-                },
-                drive));
+            DriveCommands.joystickDriveAtAngle(
+                drive,
+                () -> -controller.getLeftY(),
+                () -> -controller.getLeftX(),
+                () ->
+                    new Rotation2d(
+                        FieldConstants.Hub.innerCenterPoint.getX() - drive.getPose().getX(),
+                        FieldConstants.Hub.innerCenterPoint.getY() - drive.getPose().getY())));
+    //red auto-Aim
+    controller
+        .rightBumper()
+        .whileTrue(
+            DriveCommands.joystickDriveAtAngle(
+                drive,
+                () -> -controller.getLeftX(),
+                () -> -controller.getLeftY(),
+                () -> Rotation2d.kZero));
   }
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
