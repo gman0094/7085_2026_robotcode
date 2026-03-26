@@ -12,7 +12,6 @@ import static frc.robot.subsystems.vision.VisionConstants.robotToCamera0;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -60,8 +59,9 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    NamedCommands.registerCommand("intake", new Intake(fuelSubsystem));
-    NamedCommands.registerCommand("shoot", new LaunchSequence(fuelSubsystem));
+    NamedCommands.registerCommand("intake", new Intake(fuelSubsystem).withTimeout(5));
+    NamedCommands.registerCommand("shoot", new LaunchSequence(fuelSubsystem).withTimeout(1.5));
+
     switch (Constants.currentMode) {
       case REAL:
         drive =
@@ -180,7 +180,7 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
 
-    //Blue Auto-Aim
+    // Blue Auto-Aim
     controller
         .leftTrigger()
         .whileTrue(
@@ -192,14 +192,14 @@ public class RobotContainer {
                     new Rotation2d(
                         FieldConstants.Hub.innerCenterPoint.getX() - drive.getPose().getX(),
                         FieldConstants.Hub.innerCenterPoint.getY() - drive.getPose().getY())));
-    //red auto-Aim
+    // red auto-Aim
     controller
-        .rightBumper()
+        .rightTrigger()
         .whileTrue(
             DriveCommands.joystickDriveAtAngle(
                 drive,
-                () -> -controller.getLeftX(),
-                () -> -controller.getLeftY(),
+                () -> controller.getLeftY(),
+                () -> controller.getLeftX(),
                 () -> Rotation2d.kZero));
   }
   /**
