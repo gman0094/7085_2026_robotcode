@@ -36,7 +36,6 @@ import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
-import frc.robot.util.FieldConstants;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -60,7 +59,8 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     NamedCommands.registerCommand("intake", new Intake(fuelSubsystem).withTimeout(5));
-    NamedCommands.registerCommand("shoot", new LaunchSequence(fuelSubsystem).withTimeout(1.5));
+    NamedCommands.registerCommand("shoot", new LaunchSequence(fuelSubsystem).withTimeout(5));
+    NamedCommands.registerCommand("intake_short", new Intake(fuelSubsystem));
 
     switch (Constants.currentMode) {
       case REAL:
@@ -181,26 +181,28 @@ public class RobotContainer {
                 .ignoringDisable(true));
 
     // Blue Auto-Aim
-    controller
-        .leftTrigger()
-        .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
-                () ->
-                    new Rotation2d(
-                        FieldConstants.Hub.innerCenterPoint.getX() - drive.getPose().getX(),
-                        FieldConstants.Hub.innerCenterPoint.getY() - drive.getPose().getY())));
-    // red auto-Aim
-    controller
-        .rightTrigger()
-        .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> controller.getLeftY(),
-                () -> controller.getLeftX(),
-                () -> Rotation2d.kZero));
+    // controller
+    //     .leftTrigger()
+    //     .whileTrue(
+    //         DriveCommands.joystickDriveAtAngle(
+    //             drive,
+    //             () -> -controller.getLeftY(),
+    //             () -> -controller.getLeftX(),
+    //             () ->
+    //                 AllianceFlipUtil.apply(
+    //                     new Rotation2d(
+    //                         FieldConstants.Hub.innerCenterPoint.getX() - drive.getPose().getX(),
+    //                         FieldConstants.Hub.innerCenterPoint.getY() -
+    // drive.getPose().getY()))));
+    // // // red auto-Aim
+    // controller
+    //     .rightTrigger()
+    //     .whileTrue(
+    //         DriveCommands.joystickDriveAtAngle(
+    //             drive,
+    //             () -> controller.getLeftY(),
+    //             () -> controller.getLeftX(),
+    //             () -> Rotation2d.kZero));
   }
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

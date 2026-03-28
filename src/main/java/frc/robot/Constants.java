@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 public final class Constants {
   public static final Mode simMode = Mode.SIM;
   public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
+  public static final boolean disableHAL = false;
 
   public static enum Mode {
     /** Running on a real robot. */
@@ -44,7 +45,7 @@ public final class Constants {
     public static final double INTAKING_FEEDER_VOLTAGE = -12;
     public static final double INTAKING_INTAKE_VOLTAGE = 10;
     public static final double LAUNCHING_FEEDER_VOLTAGE = 9;
-    public static final double LAUNCHING_LAUNCHER_VOLTAGE = 10.6;
+    public static final double LAUNCHING_LAUNCHER_VOLTAGE = 9.6;
     public static final double SPIN_UP_FEEDER_VOLTAGE = -6;
     public static final double SPIN_UP_SECONDS = 0.5;
   }
