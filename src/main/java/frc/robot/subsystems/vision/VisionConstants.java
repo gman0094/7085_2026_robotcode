@@ -1,51 +1,104 @@
-// Copyright (c) 2021-2026 Littleton Robotics
-// http://github.com/Mechanical-Advantage
-//
-// Use of this source code is governed by a BSD
-// license that can be found in the LICENSE file
-// at the root directory of this project.
-
 package frc.robot.subsystems.vision;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.util.Units;
+import frc.robot.Constants;
+import frc.robot.Constants.Mode;
+import java.util.List;
+import java.util.Optional;
+import org.photonvision.PhotonPoseEstimator.ConstrainedSolvepnpParams;
+import org.photonvision.simulation.VisionSystemSim;
 
 public class VisionConstants {
-  // AprilTag layout
-  public static AprilTagFieldLayout aprilTagLayout =
-      AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
+  public static final record AprilTagCameraConfig(VisionSource source, SimCameraConfig simConfig) {}
 
-  // Camera names, must match names configured on coprocessor
-  public static String camera0Name = "AprilTagCam";
+  public static enum PoseEstimationMethod {
+    MULTI_TAG,
+    SINGLE_TAG,
+    TRIG,
+    CONSTRAINED
+  }
 
-  // Robot to camera transforms
-  // (Not used by Limelight, configure in web UI instead)
-  public static Transform3d robotToCamera0 =
-      new Transform3d(0.2, 0.0, 0.2, new Rotation3d(0.0, -0.4, 0.0));
-  public static Transform3d robotToCamera1 =
-      new Transform3d(-0.2, 0.0, 0.2, new Rotation3d(0.0, -0.4, Math.PI));
+  public static final AprilTagFieldLayout fieldLayout =
+      AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
 
-  // Basic filtering thresholds
-  public static double maxAmbiguity = 0.3;
-  public static double maxZError = 0.75;
+  public static final Optional<VisionSystemSim> aprilTagSim =
+      Constants.currentMode == Mode.SIM
+          ? Optional.of(new VisionSystemSim("AprilTagSim"))
+          : Optional.empty();
 
-  // Standard deviation baselines, for 1 meter distance and 1 tag
-  // (Adjusted automatically based on distance and # of tags)
-  public static double linearStdDevBaseline = 0.02; // Meters
-  public static double angularStdDevBaseline = 0.06; // Radians
+  public static final List<AprilTagCameraConfig> aprilTagCamerasConfigs =
+      List.of(
+          // FLO
+          new AprilTagCameraConfig(
+              new VisionSource(
+                  "RearLeft",
+                  new Transform3d(
+                      new Translation3d(
+                          Units.inchesToMeters(-5.671), // forward+
+                          Units.inchesToMeters(11.237), // left+
+                          Units.inchesToMeters(7.991)), // up+
+                      new Rotation3d(
+                          0, Units.degreesToRadians(-20.0), Units.degreesToRadians(30)))),
+              SimCameraConfig.THRIFTY_CAM_80),
+          // FLI
+          new AprilTagCameraConfig(
+              new VisionSource(
+                  "FrontLeft",
+                  new Transform3d(
+                      new Translation3d(
+                          Units.inchesToMeters(6.354), // forward+
+                          Units.inchesToMeters(11.143), // left+
+                          Units.inchesToMeters(8.058)), // up+
+                      new Rotation3d(
+                          0, Units.degreesToRadians(-27.5), Units.degreesToRadians(-10)))),
+              SimCameraConfig.THRIFTY_CAM_90),
+          // FRI
+          new AprilTagCameraConfig(
+              new VisionSource(
+                  "FrontRight",
+                  new Transform3d(
+                      new Translation3d(
+                          Units.inchesToMeters(6.354), // forward+
+                          Units.inchesToMeters(-11.143), // left+
+                          Units.inchesToMeters(8.058)), // up+
+                      new Rotation3d(
+                          0, Units.degreesToRadians(-27.5), Units.degreesToRadians(10)))),
+              SimCameraConfig.THRIFTY_CAM_90),
+          // FRO
+          new AprilTagCameraConfig(
+              new VisionSource(
+                  "RearRight",
+                  new Transform3d(
+                      new Translation3d(
+                          Units.inchesToMeters(-5.671), // forward+
+                          Units.inchesToMeters(-11.237), // left+
+                          Units.inchesToMeters(7.991)), // up+
+                      new Rotation3d(
+                          0, Units.degreesToRadians(-20.0), Units.degreesToRadians(-30)))),
+              SimCameraConfig.THRIFTY_CAM_80));
 
-  // Standard deviation multipliers for each camera
-  // (Adjust to trust some cameras more than others)
-  public static double[] cameraStdDevFactors =
-      new double[] {
-        1.0, // Camera 0
-        1.0 // Camera 1
-      };
+  public static final double ambiguityCutoff = 0.05;
+  public static final double singleTagPoseCutoffMeters = 4.0;
 
-  // Multipliers to apply for MegaTag 2 observations
-  public static double linearStdDevMegatag2Factor = 0.5; // More stable than full 3D solve
-  public static double angularStdDevMegatag2Factor =
-      Double.POSITIVE_INFINITY; // No rotation data available
+  public static final int noAmbiguity = -100;
+
+  public static final Optional<ConstrainedSolvepnpParams> constrainedSolvePnpParams =
+      Optional.of(new ConstrainedSolvepnpParams(true, 0));
+
+  // The standard deviations of our vision estimated poses, which affect correction rate
+  // (Fake values. Experiment and determine estimation noise on an actual robot.)
+  public static final Matrix<N3, N1> noStdDevs = VecBuilder.fill(0, 0, 0);
+  public static final Matrix<N3, N1> singleTagStdDevs = VecBuilder.fill(4, 4, Double.MAX_VALUE);
+  public static final Matrix<N3, N1> multiTagStdDevs = VecBuilder.fill(0.5, 0.5, Double.MAX_VALUE);
+
+  public static final Matrix<N3, N1> tagStdDevs = VecBuilder.fill(0, 0, Double.MAX_VALUE);
 }

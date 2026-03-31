@@ -7,8 +7,8 @@
 
 package frc.robot;
 
-import static frc.robot.subsystems.vision.VisionConstants.camera0Name;
-import static frc.robot.subsystems.vision.VisionConstants.robotToCamera0;
+// import static frc.robot.subsystems.vision.VisionConstants.camera0Name;
+// import static frc.robot.subsystems.vision.VisionConstants.robotToCamera0;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
@@ -33,10 +33,9 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
-import frc.robot.subsystems.vision.Vision;
-import frc.robot.subsystems.vision.VisionIO;
-import frc.robot.subsystems.vision.VisionIOPhotonVision;
-import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
+// import frc.robot.subsystems.vision.VisionIO;
+// import frc.robot.subsystems.vision.VisionIOPhotonVision;
+// import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -49,7 +48,7 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private final CANFuelSubsystem fuelSubsystem = new CANFuelSubsystem();
-  private final Vision vision;
+  // private final Vision vision;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -73,9 +72,9 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
 
-        vision =
-            new Vision(
-                drive::addVisionMeasurement, new VisionIOPhotonVision(camera0Name, robotToCamera0));
+        // vision =
+        // new Vision(
+        //     drive::addVisionMeasurement, new VisionIOPhotonVision(camera0Name, robotToCamera0));
         break;
 
       case SIM:
@@ -88,10 +87,10 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
 
-        vision =
-            new Vision(
-                drive::addVisionMeasurement,
-                new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, drive::getPose));
+        // vision =
+        //     new Vision(
+        //         drive::addVisionMeasurement,
+        //         new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, drive::getPose));
 
         break;
 
@@ -104,7 +103,7 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
-        vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
+        // vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
         break;
     }
 
@@ -180,31 +179,8 @@ public class RobotContainer {
                             new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
                     drive)
                 .ignoringDisable(true));
-
-    // Blue Auto-Aim
-    // controller
-    //     .leftTrigger()
-    //     .whileTrue(
-    //         DriveCommands.joystickDriveAtAngle(
-    //             drive,
-    //             () -> -controller.getLeftY(),
-    //             () -> -controller.getLeftX(),
-    //             () ->
-    //                 AllianceFlipUtil.apply(
-    //                     new Rotation2d(
-    //                         FieldConstants.Hub.innerCenterPoint.getX() - drive.getPose().getX(),
-    //                         FieldConstants.Hub.innerCenterPoint.getY() -
-    // drive.getPose().getY()))));
-    // // // red auto-Aim
-    // controller
-    //     .rightTrigger()
-    //     .whileTrue(
-    //         DriveCommands.joystickDriveAtAngle(
-    //             drive,
-    //             () -> controller.getLeftY(),
-    //             () -> controller.getLeftX(),
-    //             () -> Rotation2d.kZero));
   }
+  
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
